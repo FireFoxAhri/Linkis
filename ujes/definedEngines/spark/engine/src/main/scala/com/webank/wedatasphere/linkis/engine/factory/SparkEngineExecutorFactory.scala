@@ -81,7 +81,8 @@ class SparkEngineExecutorFactory extends EngineExecutorFactory with Logging{
     if (sparkSession == null) throw new SparkSessionNullException(40009, "sparkSession can not be null")
 
     val sc = sparkSession.sparkContext
-    val sqlContext = createSQLContext(sc,options)
+//    val sqlContext = createSQLContext(sc,options)
+    val sqlContext = sparkSession.sqlContext
     sc.hadoopConfiguration.set("mapred.output.compress", MAPRED_OUTPUT_COMPRESS.getValue(options))
     sc.hadoopConfiguration.set("mapred.output.compression.codec",MAPRED_OUTPUT_COMPRESSION_CODEC.getValue(options))
     println("Application report for " + sc.applicationId)
@@ -129,24 +130,24 @@ class SparkEngineExecutorFactory extends EngineExecutorFactory with Logging{
     builder.enableHiveSupport().getOrCreate()
   }
 
-  def createSQLContext(sc: SparkContext,options: JMap[String, String]) = {
-    var sqlc : SQLContext = null
-    if (DWC_SPARK_USEHIVECONTEXT.getValue(options)) {
-      val name = "org.apache.spark.sql.hive.HiveContext"
-      var hc: Constructor[_] = null
-      try {
-        hc = getClass.getClassLoader.loadClass(name).getConstructor(classOf[SparkContext])
-        sqlc = hc.newInstance(sc).asInstanceOf[SQLContext]
-      } catch {
-        case e: Throwable => {
-          logger.warn("Can't create HiveContext. Fallback to SQLContext", e)
-          sqlc = new SQLContext(sc)
-        }
-      }
-    }
-    else sqlc = new SQLContext(sc)
-    sqlc
-  }
+//  def createSQLContext(sc: SparkContext,options: JMap[String, String]) = {
+//    var sqlc : SQLContext = null
+//    if (DWC_SPARK_USEHIVECONTEXT.getValue(options)) {
+//      val name = "org.apache.spark.sql.hive.HiveContext"
+//      var hc: Constructor[_] = null
+//      try {
+//        hc = getClass.getClassLoader.loadClass(name).getConstructor(classOf[SparkContext])
+//        sqlc = hc.newInstance(sc).asInstanceOf[SQLContext]
+//      } catch {
+//        case e: Throwable => {
+//          logger.warn("Can't create HiveContext. Fallback to SQLContext", e)
+//          sqlc = new SQLContext(sc)
+//        }
+//      }
+//    }
+//    else sqlc = new SQLContext(sc)
+//    sqlc
+//  }
 
   def createOutputDir(conf: SparkConf): File = {
     val rootDir = getOption("spark.repl.classdir")
