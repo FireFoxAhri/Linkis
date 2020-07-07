@@ -79,4 +79,9 @@ core/hadoop-common/target/
 publicService/workspace/client/workspace-httpclient/target/
 userControl/target/
 
+ujes/definedEngines/shell/engine/target/
+ujes/definedEngines/shell/enginemanager/target/
+ujes/definedEngines/shell/entrance/target/
+ujes/entranceclient/target/
+
 
