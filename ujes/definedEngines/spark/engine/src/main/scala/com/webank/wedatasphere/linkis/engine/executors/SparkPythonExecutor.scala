@@ -95,7 +95,8 @@ class SparkPythonExecutor(val sc: SparkContext,  val sqlContext: SQLContext,sess
     val pythonScriptPath = CommonVars("python.script.path", "python/mix_pyspark.py").getValue
 
     val port = EngineUtils.findAvailPort
-    gatewayServer = new GatewayServer(this, port)
+//    gatewayServer = new GatewayServer(this, port)
+    gatewayServer = new GatewayServer.GatewayServerBuilder().entryPoint(this).authToken("Ctyun@2020").javaPort(port).build()
     gatewayServer.start()
 
     info("Pyspark process file path is: " + getClass.getClassLoader.getResource(pythonScriptPath).toURI)
@@ -117,7 +118,12 @@ class SparkPythonExecutor(val sc: SparkContext,  val sqlContext: SQLContext,sess
     val cmd = CommandLine.parse(pythonExec)
     cmd.addArgument(createFakeShell(pythonScriptPath).getAbsolutePath, false)
     cmd.addArgument(port.toString, false)
-    cmd.addArgument(EngineUtils.sparkSubmitVersion().replaceAll("\\.", ""), false)
+//    cmd.addArgument(EngineUtils.sparkSubmitVersion().replaceAll("\\.", ""), false)
+    val preview_version = EngineUtils.sparkSubmitVersion().replaceAll("\\.", "")
+    val index = preview_version.indexOf("-")
+    val version = preview_version.substring(0, index)
+    cmd.addArgument(version, false)
+
     cmd.addArgument(pythonClasspath.toString(), false)
     cmd.addArgument(pyFiles, false)
 
