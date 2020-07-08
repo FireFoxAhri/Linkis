@@ -75,7 +75,7 @@ class SparkEngineExecutorFactory extends EngineExecutorFactory with Logging{
     scalaExecutor.outputDir = outputDir
     scalaExecutor.start()
     Utils.waitUntil(() => scalaExecutor.sparkILoopInited == true && scalaExecutor.sparkILoop.intp != null, new TimeType("120s").toDuration)
-    Thread.currentThread().setContextClassLoader(scalaExecutor.sparkILoop.intp.classLoader)
+//    Thread.currentThread().setContextClassLoader(scalaExecutor.sparkILoop.intp.classLoader)
     info("print current thread name "+ Thread.currentThread().getContextClassLoader.toString)
     val sparkSession = createSparkSession(outputDir, conf)
     if (sparkSession == null) throw new SparkSessionNullException(40009, "sparkSession can not be null")
