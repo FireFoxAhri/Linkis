@@ -84,7 +84,17 @@ abstract class JavaProcessEngineBuilder extends ProcessEngineBuilder {
 
   override def start(args: Array[String]): Process = {
     commandLine += args.mkString(" ")
-    val command = Seq(JavaProcessEngineBuilder.sudoUserScript.getValue, request.user, commandLine.mkString(" "))
+    var user = request.user
+    var proxyUser = CommonVars("wds.linkis.enginemanager.superuser", "").getValue
+    if (proxyUser != "") {
+      user = proxyUser;
+    }
+    val assignProxyUser = CommonVars(request.user + ".wds.linkis.enginemanager.superuser", "").getValue
+    if (assignProxyUser != "") {
+      user = assignProxyUser
+    }
+    val command = Seq(JavaProcessEngineBuilder.sudoUserScript.getValue, user, commandLine.mkString(" "))
+//    val command = Seq(JavaProcessEngineBuilder.sudoUserScript.getValue, request.user, commandLine.mkString(" "))
     val pb = new ProcessBuilder(command:_*)
     info("Running " + command.mkString(" "))
     pb.redirectErrorStream(true)

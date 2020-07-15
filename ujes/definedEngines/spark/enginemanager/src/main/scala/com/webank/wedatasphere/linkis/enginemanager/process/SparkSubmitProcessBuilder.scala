@@ -19,6 +19,7 @@ package com.webank.wedatasphere.linkis.enginemanager.process
 
 import java.lang.ProcessBuilder.Redirect
 
+import com.webank.wedatasphere.linkis.common.conf.CommonVars
 import com.webank.wedatasphere.linkis.common.utils.Logging
 import com.webank.wedatasphere.linkis.enginemanager.EngineResource
 import com.webank.wedatasphere.linkis.enginemanager.conf.EnvConfiguration._
@@ -328,7 +329,17 @@ class SparkSubmitProcessBuilder extends ProcessEngineBuilder with Logging {
     //command="ipconfig"
     info(s"Running ${command}")
 
-    val sudoCommand = Array(JavaProcessEngineBuilder.sudoUserScript.getValue, request.user, command)
+    var user = request.user
+    var proxyUser = CommonVars("wds.linkis.enginemanager.superuser", "").getValue
+    if (proxyUser != "") {
+      user = proxyUser
+    }
+    val assignProxyUser = CommonVars(request.user + ".wds.linkis.enginemanager.superuser", "").getValue
+    if (assignProxyUser != "") {
+      user = assignProxyUser
+    }
+//    val sudoCommand = Array(JavaProcessEngineBuilder.sudoUserScript.getValue, request.user, command)
+    val sudoCommand = Array(JavaProcessEngineBuilder.sudoUserScript.getValue, user, command)
 
     val pb = new ProcessBuilder(sudoCommand: _*)
     //val pb = new ProcessBuilder(command.split("\\s+").toList.asJava)
