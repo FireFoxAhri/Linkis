@@ -18,8 +18,6 @@ package com.webank.wedatasphere.linkis.gateway.security
 
 import java.awt.Font
 import java.util
-import java.util.Random
-
 import com.google.gson.{Gson, JsonObject}
 import com.webank.wedatasphere.linkis.common.utils.{Logging, RSAUtils, Utils}
 import com.webank.wedatasphere.linkis.gateway.config.GatewayConfiguration
@@ -32,7 +30,6 @@ import com.webank.wedatasphere.linkis.server.security.SSOUtils
 import com.webank.wedatasphere.linkis.server.{Message, _}
 import com.wf.captcha.SpecCaptcha
 import com.wf.captcha.base.Captcha
-import javax.servlet.http.Cookie
 import org.apache.commons.lang.StringUtils
 
 /**
