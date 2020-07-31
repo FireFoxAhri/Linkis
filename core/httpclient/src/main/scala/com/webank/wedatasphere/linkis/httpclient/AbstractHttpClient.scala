@@ -33,13 +33,14 @@ import org.apache.http.client.methods.{CloseableHttpResponse, HttpGet, HttpPost}
 import org.apache.http.client.utils.URIBuilder
 import org.apache.http.entity.mime.MultipartEntityBuilder
 import org.apache.http.entity.{ContentType, StringEntity}
-import org.apache.http.impl.client.HttpClients
+import org.apache.http.impl.client.{BasicCookieStore, HttpClients}
 import org.apache.http.message.BasicNameValuePair
 import org.apache.http.util.EntityUtils
 import org.apache.http.{HttpException, HttpResponse, _}
 import org.json4s.jackson.Serialization.read
 import org.json4s.{DefaultFormats, Formats}
-
+import org.apache.http.client.protocol.HttpClientContext
+import org.apache.http.impl.cookie.BasicClientCookie
 import scala.collection.Iterable
 import scala.collection.JavaConversions._
 import scala.concurrent.duration.Duration
@@ -169,6 +170,7 @@ abstract class AbstractHttpClient(clientConfig: ClientConfig, clientName: String
         httpPost.setEntity(httpEntity)
         response = httpClient.execute(httpPost)
       case post: POSTAction =>
+        val postUri = new URIBuilder(realURL).build()
         val httpPost = new HttpPost(realURL)
         if (post.getParameters.nonEmpty || post.getFormParams.nonEmpty) {
           val nvps = new util.ArrayList[NameValuePair]
@@ -191,27 +193,66 @@ abstract class AbstractHttpClient(clientConfig: ClientConfig, clientName: String
         if (requestAction.getHeaders.nonEmpty) {
           requestAction.getHeaders.foreach { case (k, v) => httpPost.addHeader(k.toString(), v.toString()) }
         }
-        response = httpClient.execute(httpPost)
+
+        // 设置cookies
+        val context = new HttpClientContext
+        if(requestAction.getCookies.nonEmpty) {
+          val cookieStore = new BasicCookieStore
+          // setDomain以解决PublicSuffixDomainFilter.match中NullPointerException
+          requestAction.getCookies.foreach(cookie => {
+            val basicCookie = cookie.asInstanceOf[BasicClientCookie]
+            basicCookie.setDomain(postUri.getHost)
+            cookieStore.addCookie(basicCookie)
+          })
+          context.setCookieStore(cookieStore)
+        }
+        response = httpClient.execute(httpPost, context)
       case get: GetAction =>
         val builder = new URIBuilder(realURL)
         if (!get.getParameters.isEmpty) {
           get.getParameters.foreach { case (k, v) => builder.addParameter(k.toString(), v.toString()) }
         }
-        val httpGet = new HttpGet(builder.build())
+        val getUri = builder.build()
+        val httpGet = new HttpGet(getUri)
         if (requestAction.getHeaders.nonEmpty) {
           requestAction.getHeaders.foreach { case (k, v) => httpGet.addHeader(k.toString(), v.toString()) }
         }
-        response = httpClient.execute(httpGet);
+        // 设置cookies
+        val context = new HttpClientContext
+        if(requestAction.getCookies.nonEmpty) {
+          val cookieStore = new BasicCookieStore
+          // setDomain以解决PublicSuffixDomainFilter.match中NullPointerException
+          requestAction.getCookies.foreach(cookie => {
+            val basicCookie = cookie.asInstanceOf[BasicClientCookie]
+            basicCookie.setDomain(getUri.getHost)
+            cookieStore.addCookie(basicCookie)
+          })
+          context.setCookieStore(cookieStore)
+        }
+        response = httpClient.execute(httpGet, context)
       case _ =>
-        val httpost = new HttpPost(realURL)
+        val postUri = new URIBuilder(realURL).build()
+        val httpPost = new HttpPost(realURL)
         val stringEntity = new StringEntity(requestAction.getRequestBody, "UTF-8")
         stringEntity.setContentEncoding(Configuration.BDP_ENCODING.getValue)
         stringEntity.setContentType("application/json")
-        httpost.setEntity(stringEntity)
+        httpPost.setEntity(stringEntity)
         if (requestAction.getHeaders.nonEmpty) {
-          requestAction.getHeaders.foreach { case (k, v) => httpost.addHeader(k.toString(), v.toString()) }
+          requestAction.getHeaders.foreach { case (k, v) => httpPost.addHeader(k.toString(), v.toString()) }
         }
-        response = httpClient.execute(httpost)
+        // 设置cookies
+        val context = new HttpClientContext
+        if(requestAction.getCookies.nonEmpty) {
+          val cookieStore = new BasicCookieStore
+          // setDomain以解决PublicSuffixDomainFilter.match中NullPointerException
+          requestAction.getCookies.foreach(cookie => {
+            val basicCookie = cookie.asInstanceOf[BasicClientCookie]
+            basicCookie.setDomain(postUri.getHost)
+            cookieStore.addCookie(basicCookie)
+          })
+          context.setCookieStore(cookieStore)
+        }
+        response = httpClient.execute(httpPost, context)
     }
     response
   }
