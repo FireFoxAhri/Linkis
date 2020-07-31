@@ -35,6 +35,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -146,8 +147,18 @@ public class ApplicationRestfulApi {
 
     @GET
     @Path("get")
-    public Response getApplication(@Context HttpServletRequest req, @PathVariable Long applicationId) {
+    public Response getApplication(@Context HttpServletRequest req,@Context HttpServletResponse response, @PathVariable Long applicationId) throws IOException {
         return Message.messageToResponse(Message.ok());
+    }
+
+    @GET
+    @Path("ssologin")
+    public void getApplication(@Context HttpServletResponse response) {
+        try {
+            response.sendRedirect("http://ai.ctyun.cn:8088");
+        }catch (IOException e){
+            System.out.println("重定向错误"+e);
+        }
     }
 
     @POST

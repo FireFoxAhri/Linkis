@@ -133,6 +133,7 @@
         <module>datasource/datasourcemanager/server</module>
         <module>assembly/public-module</module>
         <module>assembly</module>
+        <module>ctyunCas</module>
 
     </modules>
 
