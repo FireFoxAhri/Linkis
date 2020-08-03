@@ -29,4 +29,5 @@ public class ApplicationConfiguration {
     public static final CommonVars ISASH_LEVEL = CommonVars$.MODULE$.apply("wds.linkis.application.ash.level",4);
     public static final CommonVars INIT_ORGID = CommonVars$.MODULE$.apply("wds.linkis.application.init.orgid",3);
     public static final CommonVars DWS_PARAMS = CommonVars$.MODULE$.apply("wds.linkis.application.dws.params","");
+    public static final CommonVars LUBAN_HOME = CommonVars$.MODULE$.apply("wds.linkis.application.sso.home", "/");
 }

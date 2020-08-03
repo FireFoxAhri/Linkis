@@ -30,6 +30,8 @@ import com.webank.wedatasphere.linkis.application.service.ApplicationService;
 import com.webank.wedatasphere.linkis.application.util.ApplicationUtils;
 import lombok.Cleanup;
 import org.codehaus.jackson.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,6 +43,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.*;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,6 +58,8 @@ import java.util.stream.Collectors;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class ApplicationRestfulApi {
+
+    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     @Autowired
     ApplicationService applicationService;
@@ -153,12 +158,12 @@ public class ApplicationRestfulApi {
 
     @GET
     @Path("ssologin")
-    public void getApplication(@Context HttpServletResponse response) {
-        try {
-            response.sendRedirect("http://ai.ctyun.cn:8088");
-        }catch (IOException e){
-            System.out.println("重定向错误"+e);
-        }
+    public Response ssoLoginRedirect(@Context HttpServletRequest req, @Context HttpServletResponse response) throws IOException {
+        LOGGER.info(req.getRemoteHost());
+        Object homeURL = ApplicationConfiguration.LUBAN_HOME.getValue();
+        URI url = URI.create(homeURL.toString());
+        //必须加.type(MediaType.APPLICATION_JSON)  网关获取content_type 会报错
+        return Response.status(Response.Status.FOUND).type(MediaType.APPLICATION_JSON).location(url).build();
     }
 
     @POST
