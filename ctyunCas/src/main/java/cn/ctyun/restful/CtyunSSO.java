@@ -4,6 +4,7 @@ package cn.ctyun.restful;
 import java.net.URI;
 
 import cn.ctyun.utils.CasValidate;
+import com.webank.wedatasphere.linkis.gateway.config.GatewayConfiguration;
 import com.webank.wedatasphere.linkis.gateway.http.GatewayContext;
 import com.webank.wedatasphere.linkis.gateway.security.GatewaySSOUtils;
 import com.webank.wedatasphere.linkis.gateway.security.sso.SSOInterceptor;
@@ -57,6 +58,6 @@ public class CtyunSSO implements SSOInterceptor {
     @Override
     public String redirectTo(URI requestUrl) {
         GatewaySSOUtils.logger().info("redirectTo:"+requestUrl);
-        return "http://www.ctyun.cn/cas/login?service=http://ai.ctyun.cn:8088/api/rest_j/v1/application/ssologin";
+        return "http://www.ctyun.cn/cas/login?service=" + GatewayConfiguration.SSO_LOGIN_URL().getValue();
     }
 }

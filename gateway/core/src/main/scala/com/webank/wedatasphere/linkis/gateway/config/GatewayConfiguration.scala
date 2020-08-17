@@ -51,4 +51,6 @@ object GatewayConfiguration {
   val USERCONTROL_SPRING_APPLICATION_NAME = CommonVars("wds.linkis.query.application.name", "cloud-usercontrol")
 
   val ENABLE_LOGIN_CAPTCHA = CommonVars("wds.linkis.gateway.conf.enable.login.captcha", false)
+
+  val SSO_LOGIN_URL = CommonVars("wds.linkis.gateway.conf.sso.url", "")
 }
