@@ -40,18 +40,21 @@
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.9</version>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>com.github.anylogic</groupId>
             <artifactId>alogic-common</artifactId>
             <version>1.6.7</version>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20200518</version>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
