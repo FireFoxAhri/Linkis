@@ -53,4 +53,6 @@ object GatewayConfiguration {
   val ENABLE_LOGIN_CAPTCHA = CommonVars("wds.linkis.gateway.conf.enable.login.captcha", false)
 
   val SSO_LOGIN_URL = CommonVars("wds.linkis.gateway.conf.sso.url", "")
+
+  val LUBAN_REGISTER_URL = CommonVars("wds.linkis.gateway.conf.register.url", "")
 }
