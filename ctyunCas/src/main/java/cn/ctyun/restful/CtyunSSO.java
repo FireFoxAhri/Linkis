@@ -101,6 +101,11 @@ public class CtyunSSO implements SSOInterceptor {
             HttpEntity entity = response.getEntity();
             String responseContent = EntityUtils.toString(entity, "UTF-8");
             if (response.getStatusLine().getStatusCode() == 200 && responseContent != null) {
+                //还有业务错误 需要排除
+                if(responseContent.contains("{\"success\":1")){
+                    GatewaySSOUtils.logger().error("注册用户失败：" +responseContent);
+                    return null;
+                }
                 return responseContent;
             }else {
                 GatewaySSOUtils.logger().error("注册用户失败：");
