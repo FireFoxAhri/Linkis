@@ -39,6 +39,7 @@ object GatewayConfiguration {
   val SSO_INTERCEPTOR_CLASS = CommonVars("wds.linkis.gateway.conf.sso.interceptor", "")
 
   val ADMIN_USER = CommonVars("wds.linkis.gateway.admin.user", "hadoop")
+  val ADMIN_PASSWORD = CommonVars("wds.linkis.gateway.admin.password", "hadoop")
 
   val USERCONTROL_SWITCH_ON = CommonVars("wds.linkis.gateway.usercontrol_switch_on", false)
 
