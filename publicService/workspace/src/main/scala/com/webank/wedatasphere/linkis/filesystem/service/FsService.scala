@@ -96,7 +96,7 @@ class FsService extends Logging {
 
   def produceFSInfo(user: String, fsPath: FsPath): FSInfo = {
     try {
-      val fs = FSFactory.getFs(fsPath).asInstanceOf[FileSystem]
+      val fs = FSFactory.getFsByProxyUser(fsPath,user).asInstanceOf[FileSystem]
       fs.init(null)
       new FSInfo(user, fs, System.currentTimeMillis())
     } catch {
