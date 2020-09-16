@@ -68,11 +68,11 @@ abstract class AbstractLogWriter(logPath: String,
                                  user: String,
                                  charset: String) extends LogWriter(charset) {
   if(StringUtils.isBlank(logPath)) throw new EntranceErrorException(20301, "logPath cannot be empty.")
-  protected val fileSystem = FSFactory.getFs(new FsPath(logPath))
+  protected val fileSystem = FSFactory.getFsByProxyUser(new FsPath(logPath), user)
   fileSystem.init(new util.HashMap[String, String]())
 
   protected val outputStream: OutputStream = {
-    FileSystemUtils.createNewFile(new FsPath(logPath), true)
+    FileSystemUtils.createNewFile(new FsPath(logPath),user, true)
     fileSystem.write(new FsPath(logPath), true)
   }
 
