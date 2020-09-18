@@ -118,12 +118,7 @@ class SparkPythonExecutor(val sc: SparkContext,  val sqlContext: SQLContext,sess
     val cmd = CommandLine.parse(pythonExec)
     cmd.addArgument(createFakeShell(pythonScriptPath).getAbsolutePath, false)
     cmd.addArgument(port.toString, false)
-//    cmd.addArgument(EngineUtils.sparkSubmitVersion().replaceAll("\\.", ""), false)
-    val preview_version = EngineUtils.sparkSubmitVersion().replaceAll("\\.", "")
-    val index = preview_version.indexOf("-")
-    val version = preview_version.substring(0, index)
-    cmd.addArgument(version, false)
-
+    cmd.addArgument(EngineUtils.sparkSubmitVersion().replaceAll("\\.", ""), false)
     cmd.addArgument(pythonClasspath.toString(), false)
     cmd.addArgument(pyFiles, false)
 

@@ -234,7 +234,6 @@ class RMMonitorRest {
     val queues = new mutable.LinkedHashSet[String]()
     val userConfiguration = UserConfiguration.getCacheMap(RequestQueryAppConfigWithGlobal(userName, null, null, true))
     queues.add(RMConfiguration.USER_AVAILABLE_YARN_QUEUE_NAME.getValue(userConfiguration))
-    queues.add(RMConfiguration.USER_AVAILABLE_YARN_QUEUE_NAME.getValue)
     appendMessageData(message, "queues", queues)
   }
 
