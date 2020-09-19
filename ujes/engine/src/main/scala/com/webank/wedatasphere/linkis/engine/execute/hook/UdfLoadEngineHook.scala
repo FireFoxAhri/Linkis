@@ -16,18 +16,20 @@
 
 package com.webank.wedatasphere.linkis.engine.execute.hook
 
-import java.io.File
+import java.io.{File, InputStream, StringWriter}
 
+import com.webank.wedatasphere.linkis.common.io.FsPath
 import com.webank.wedatasphere.linkis.common.utils.Logging
 import com.webank.wedatasphere.linkis.engine.conf.EngineConfiguration._
 import com.webank.wedatasphere.linkis.engine.execute.{EngineExecutor, EngineHook}
 import com.webank.wedatasphere.linkis.rpc.Sender
 import com.webank.wedatasphere.linkis.scheduler.executer.{ExecuteRequest, RunTypeExecuteRequest}
 import com.webank.wedatasphere.linkis.server.JMap
+import com.webank.wedatasphere.linkis.storage.FSFactory
 import com.webank.wedatasphere.linkis.udf.api.rpc.{RequestUdfTree, ResponseUdfTree}
 import com.webank.wedatasphere.linkis.udf.entity.{UDFInfo, UDFTree}
 import org.apache.commons.collections.CollectionUtils
-import org.apache.commons.io.FileUtils
+import org.apache.commons.io.{Charsets, FileUtils, IOUtils}
 import org.apache.commons.lang.StringUtils
 
 import scala.collection.JavaConversions._
@@ -130,14 +132,46 @@ abstract class UdfLoadEngineHook extends EngineHook with Logging{ self =>
     udfTree
   }
 
+  private def readHdfsFile(path: String): String = {
+    info("reading udfFile from hdfs")
+    val fs = FSFactory.getFs("hdfs", user)
+    try {
+      val fsPath = new FsPath(path)
+      fs.init(null)
+      if (!fs.exists(fsPath)) {
+        warn("udf file: [" + path + "] doesn't exist, ignore it.")
+        ""
+      } else {
+        var inputStream: InputStream = null
+        try {
+          inputStream = fs.read(fsPath)
+          val writer = new StringWriter()
+          IOUtils.copy(inputStream, writer, Charsets.UTF_8)
+          writer.toString
+        } finally {
+          if(inputStream != null) {
+            inputStream.close()
+          }
+        }
+      }
+    } finally {
+      fs.close()
+    }
+  }
+
   protected def readFile(path: String): String = {
+
     info("read file: " + path)
-    val file = new File(path)
-    if(file.exists()){
-      FileUtils.readFileToString(file)
+    if(path.startsWith("hdfs://")) {
+      readHdfsFile(path)
     } else {
-      info("udf file: [" + path + "] doesn't exist, ignore it.")
-      ""
+      val file = new File(path)
+      if (file.exists()) {
+        FileUtils.readFileToString(file)
+      } else {
+        warn("udf file: [" + path + "] doesn't exist, ignore it.")
+        ""
+      }
     }
   }
 

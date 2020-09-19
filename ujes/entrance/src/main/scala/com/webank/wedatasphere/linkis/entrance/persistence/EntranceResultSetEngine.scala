@@ -49,8 +49,8 @@ class EntranceResultSetEngine extends ResultSetEngine {
           //TODO Remove _ stitching(去掉_拼接)
           val path = if(alias.contains("_")) resultSet.getResultSetPath(new FsPath(storePath),  alias) else resultSet.getResultSetPath(new FsPath(storePath),  "_" + alias)
 
-          FileSystemUtils.createNewFile(path,true)
-          val writer = ResultSetWriter.getResultSetWriter(resultSet, 0, path,StorageUtils.getJvmUser)
+          FileSystemUtils.createNewFile(path, user,true)
+          val writer = ResultSetWriter.getResultSetWriter(resultSet, 0, path,user)
           Utils.tryFinally {
             writer.addMetaDataAndRecordString(output)
             writer.flush()
