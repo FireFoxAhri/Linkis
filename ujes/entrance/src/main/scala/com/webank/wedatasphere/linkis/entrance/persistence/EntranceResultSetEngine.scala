@@ -50,7 +50,7 @@ class EntranceResultSetEngine extends ResultSetEngine {
           val path = if(alias.contains("_")) resultSet.getResultSetPath(new FsPath(storePath),  alias) else resultSet.getResultSetPath(new FsPath(storePath),  "_" + alias)
 
           FileSystemUtils.createNewFile(path, user,true)
-          val writer = ResultSetWriter.getResultSetWriter(resultSet, 0, path,StorageUtils.getJvmUser)
+          val writer = ResultSetWriter.getResultSetWriter(resultSet, 0, path,user)
           Utils.tryFinally {
             writer.addMetaDataAndRecordString(output)
             writer.flush()
