@@ -61,7 +61,7 @@ function isLocal(){
 }
 
 
-source ${workDir}/bin/common.sh
+source ${workDir}/common.sh
 
 
 #if there is no LINKIS_INSTALL_HOME，we need to source config again
