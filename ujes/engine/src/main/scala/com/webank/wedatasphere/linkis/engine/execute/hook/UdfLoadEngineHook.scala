@@ -173,16 +173,6 @@ abstract class UdfLoadEngineHook extends EngineHook with Logging{ self =>
         ""
       }
     }
-
-
-    info("read file: " + path)
-    val file = new File(path)
-    if(file.exists()){
-      FileUtils.readFileToString(file)
-    } else {
-      info("udf file: [" + path + "] doesn't exist, ignore it.")
-      ""
-    }
   }
 
 
