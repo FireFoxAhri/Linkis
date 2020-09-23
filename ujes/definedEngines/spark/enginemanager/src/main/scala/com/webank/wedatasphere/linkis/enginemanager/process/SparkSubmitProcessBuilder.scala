@@ -366,6 +366,8 @@ class SparkSubmitProcessBuilder extends ProcessEngineBuilder with Logging {
         p
       } else if (p.startsWith("file://")) {
         p
+      } else if (p.startsWith("viewfs://")) {
+        p
       } else {
         fsRoot + "/" + p
       }
