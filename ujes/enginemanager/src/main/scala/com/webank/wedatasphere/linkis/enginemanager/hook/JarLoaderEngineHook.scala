@@ -38,7 +38,7 @@ class JarLoaderEngineHook extends EngineHook with Logging{
     val udfInfos = extractUdfInfos(requestEngine).filter{info => info.getUdfType == 0 && info.getExpire == false && StringUtils.isNotBlank(info.getPath) && isJarExists(info) && info.getLoad == true }
     // add to class path
     val jars = new mutable.HashSet[String]()
-    udfInfos.foreach{udfInfo => jars.add("file://" + udfInfo.getPath)}
+    udfInfos.foreach{udfInfo => jars.add( udfInfo.getPath)}
     val jarPaths = jars.mkString(",")
     if(StringUtils.isBlank(requestEngine.properties.get("jars"))){
       requestEngine.properties.put("jars", jarPaths)
