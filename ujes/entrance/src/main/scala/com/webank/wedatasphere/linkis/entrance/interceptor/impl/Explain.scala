@@ -82,6 +82,7 @@ object SQLExplain extends Explain {
   val SQL_APPEND_LIMIT:String = " limit " + SQL_DEFAULT_LIMIT.getValue
   val DROP_TABLE_SQL = "\\s*drop\\s+table\\s+\\w+\\s*"
   val CREATE_DATABASE_SQL = "\\s*create\\s+database\\s+\\w+\\s*"
+  val SHOW_DATABASE_SQL = "\\s*show\\s+databases\\s+\\w+\\s*"
   private val LINE_BREAK = "\n"
   private val COMMENT_FLAG = "--"
   val SET_OWN_USER = "set owner user"
@@ -92,6 +93,9 @@ object SQLExplain extends Explain {
   override def authPass(code: String, error: StringBuilder): Boolean = {
     if (code.trim.matches(CREATE_DATABASE_SQL)){
       error.append("Sorry, you have no permission to create database")
+      false
+    }else if(code.trim.matches(SHOW_DATABASE_SQL)){
+      error.append("Sorry, you have no permission to show databases")
       false
     }else true
   }
