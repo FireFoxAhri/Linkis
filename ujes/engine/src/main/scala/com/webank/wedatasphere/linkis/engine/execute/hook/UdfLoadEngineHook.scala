@@ -23,7 +23,7 @@ import com.webank.wedatasphere.linkis.common.utils.Logging
 import com.webank.wedatasphere.linkis.engine.conf.EngineConfiguration._
 import com.webank.wedatasphere.linkis.engine.execute.{EngineExecutor, EngineHook}
 import com.webank.wedatasphere.linkis.rpc.Sender
-import com.webank.wedatasphere.linkis.scheduler.executer.{ExecuteRequest, RunTypeExecuteRequest}
+import com.webank.wedatasphere.linkis.scheduler.executer.{ExecuteRequest, RunTypeExecuteRequest, UserExecuteRequest}
 import com.webank.wedatasphere.linkis.server.JMap
 import com.webank.wedatasphere.linkis.storage.FSFactory
 import com.webank.wedatasphere.linkis.udf.api.rpc.{RequestUdfTree, ResponseUdfTree}
@@ -58,9 +58,10 @@ abstract class UdfLoadEngineHook extends EngineHook with Logging{ self =>
       case "" =>
       case c: String =>
         info("Submit udf registration to engine, code: " + c)
-        executor.execute(new ExecuteRequest with RunTypeExecuteRequest{
+        executor.execute(new ExecuteRequest with RunTypeExecuteRequest with UserExecuteRequest{
           override val code: String = c
           override val runType: String = self.runType
+          override val user: String = self.user
         })
         info("executed code: " + c)
     }
