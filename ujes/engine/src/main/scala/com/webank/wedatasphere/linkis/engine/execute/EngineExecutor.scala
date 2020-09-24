@@ -98,6 +98,10 @@ abstract class EngineExecutor(outputPrintLimit: Int, isSupportParallelism: Boole
       case store: StorePathExecuteRequest => engineExecutorContext.setStorePath(store.storePath)
       case _ =>
     }
+    executeRequest match {
+      case user: UserExecuteRequest => engineExecutorContext.setUser(user.user)
+      case _ =>
+    }
     engineExecutorContext
   }
 
