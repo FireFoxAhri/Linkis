@@ -50,6 +50,7 @@ class EngineExecutorContext(engineExecutor: EngineExecutor) extends Logging {
   private var jobId: Option[String] = None
   private val aliasNum = new AtomicInteger(0)
   protected var storePath: Option[String] = None
+  protected var user: Option[String] = None
 
   private val properties: java.util.Map[String, Object] = new util.HashMap[String, Object]()
 
@@ -116,6 +117,8 @@ class EngineExecutorContext(engineExecutor: EngineExecutor) extends Logging {
 
   def setStorePath(storePath: String) = this.storePath = Option(storePath)
 
+  def setUser(user: String) = this.user = Option(user)
+
   def sendResultSet(outputExecuteResponse: OutputExecuteResponse): Unit = outputExecuteResponse match {
     case AliasOutputExecuteResponse(alias, output) => sendResultSet(output, alias)
     case output: OutputExecuteResponse => sendResultSet(output.getOutput, "_" + aliasNum.getAndIncrement())
@@ -127,7 +130,7 @@ class EngineExecutorContext(engineExecutor: EngineExecutor) extends Logging {
 
   protected def getDefaultStorePath: String = {
     val path = ENGINE_RESULT_SET_STORE_PATH.getValue
-    (if (path.endsWith("/")) path else path + "/") + "user" + "/" +
+    (if (path.endsWith("/")) path else path + "/") + user + "/" +
       DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd") + "/" + Sender.getThisServiceInstance.getApplicationName +
       "/" + System.nanoTime
   }
