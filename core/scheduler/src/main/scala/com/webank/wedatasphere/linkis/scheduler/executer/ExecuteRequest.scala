@@ -28,3 +28,6 @@ trait JobExecuteRequest {
 trait RunTypeExecuteRequest{
   val runType:String
 }
+trait UserExecuteRequest{
+  val user:String
+}
