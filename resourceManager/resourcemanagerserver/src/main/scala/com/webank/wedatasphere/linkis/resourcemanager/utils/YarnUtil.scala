@@ -201,7 +201,18 @@ object YarnUtil extends Logging{
           debug(s"cannot find any information about queue $queueName, response: " + resp)
           throw new RMWarnException(11006, s"queue $queueName is not exists in YARN.")
         }
-        (maxEffectiveHandle(queue).get, getYarnResource(queue.map( _ \ "resourcesUsed")).get)
+        val memory = queue.map( _ \ "capacities" \ "queueCapacitiesByPartition" \ "configuredMaxResource" \ "memory") match {
+          case Some(JArray(List(JInt(x)))) => x.toLong * 1024 * 1024
+        }
+        val vCores = queue.map( _ \ "capacities" \ "queueCapacitiesByPartition" \ "configuredMaxResource" \ "vCores") match {
+          case Some(JArray(List(JInt(x)))) => x.toInt
+        }
+        (new YarnResource(memory, vCores, 0, queueName),
+          getYarnResource(queue.map( _ \ "resourcesUsed")).get)
+
+//        (getYarnResource(queue.map( _ \ "capacities" \ "queueCapacitiesByPartition" \ "configuredMaxResource")).get,
+//          getYarnResource(queue.map( _ \ "resourcesUsed")).get)
+//        (maxEffectiveHandle(queue).get, getYarnResource(queue.map( _ \ "resourcesUsed")).get)
       } else if ("fairScheduler".equals(schedulerType)) {
         val childQueues = getChildQueues(resp \ "scheduler" \ "schedulerInfo" \ "rootQueue")
         val queue = getQueue(childQueues)
