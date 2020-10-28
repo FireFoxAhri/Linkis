@@ -47,6 +47,7 @@ object CustomVariableUtils extends Logging {
   val JAVA_TYPE:String = "java"
   val SCALA_TYPE:String = "scala"
   val R_TYPE:String = "r"
+  val SHELL_TYPE:String = "shell"
   val RUN_DATE = "run_date"
   val TEAM:String = "team"
 
@@ -77,6 +78,7 @@ object CustomVariableUtils extends Logging {
       case "python" | "py" => codeType = PY_TYPE
       case "java" => codeType = JAVA_TYPE
       case "scala" => codeType = SCALA_TYPE
+      case "shell" => codeType = SHELL_TYPE
       case _ => return (false, code)
     }
 
@@ -304,6 +306,8 @@ object CustomVariableUtils extends Logging {
       case SCALA_TYPE => varString = """\s*//@set\s*.+\s*"""
         errString = """\s*//@.+"""
       case JAVA_TYPE => varString = """\s*!!@set\s*.+\s*"""
+      case SHELL_TYPE => varString = """\s*#@set\s*.+\s*"""
+        errString = """\s*#@"""
     }
 
     val customRegex = varString.r.unanchored
