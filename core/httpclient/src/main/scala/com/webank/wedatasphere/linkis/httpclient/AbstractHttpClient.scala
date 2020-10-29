@@ -13,6 +13,8 @@
 
 package com.webank.wedatasphere.linkis.httpclient
 
+import java.security.KeyStore
+import java.security.cert.X509Certificate
 import java.util
 import java.util.concurrent.TimeUnit
 
@@ -26,6 +28,7 @@ import com.webank.wedatasphere.linkis.httpclient.exception.{HttpClientResultExce
 import com.webank.wedatasphere.linkis.httpclient.loadbalancer.{AbstractLoadBalancer, DefaultLoadbalancerStrategy, LoadBalancer}
 import com.webank.wedatasphere.linkis.httpclient.request._
 import com.webank.wedatasphere.linkis.httpclient.response._
+import javax.net.ssl.SSLContext
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringUtils
 import org.apache.http.client.entity.UrlEncodedFormEntity
@@ -33,18 +36,24 @@ import org.apache.http.client.methods.{CloseableHttpResponse, HttpGet, HttpPost}
 import org.apache.http.client.utils.URIBuilder
 import org.apache.http.entity.mime.MultipartEntityBuilder
 import org.apache.http.entity.{ContentType, StringEntity}
-import org.apache.http.impl.client.{BasicCookieStore, HttpClients}
+import org.apache.http.impl.client.{BasicCookieStore, CloseableHttpClient, HttpClientBuilder, HttpClients}
 import org.apache.http.message.BasicNameValuePair
 import org.apache.http.util.EntityUtils
 import org.apache.http.{HttpException, HttpResponse, _}
 import org.json4s.jackson.Serialization.read
 import org.json4s.{DefaultFormats, Formats}
 import org.apache.http.client.protocol.HttpClientContext
-import org.apache.http.impl.cookie.BasicClientCookie
+import org.apache.http.conn.ssl.{NoopHostnameVerifier, SSLConnectionSocketFactory}
+
 import scala.collection.Iterable
 import scala.collection.JavaConversions._
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService}
+import org.apache.http.conn.ssl.NoopHostnameVerifier
+import org.apache.http.impl.cookie.BasicClientCookie
+import org.apache.http.ssl.{SSLContexts, TrustStrategy}
+
+import scala.tools.jline_embedded.internal.Log
 
 
 /**
@@ -57,7 +66,21 @@ abstract class AbstractHttpClient(clientConfig: ClientConfig, clientName: String
   protected val httpTimeout: Duration = if (clientConfig.getReadTimeout > 0) Duration(clientConfig.getReadTimeout, TimeUnit.MILLISECONDS)
   else Duration.Inf
 
-  protected val httpClient = HttpClients.createDefault()
+  protected var httpClient:CloseableHttpClient = null
+
+  protected val mhttpClient = HttpClients.createDefault()
+
+  protected val httpClients: CloseableHttpClient =  {
+    val sslContext = SSLContexts.custom.loadTrustMaterial(null, new TrustStrategy {
+      override def isTrusted(x509Certificates: Array[X509Certificate], s: String): Boolean = true
+    }).build()
+
+    val connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier)
+    val httpClientBuilder = HttpClients.custom
+    httpClientBuilder.setSSLSocketFactory(connectionSocketFactory)
+    httpClientBuilder.build
+  }
+
 
   if (clientConfig.getAuthenticationStrategy != null) clientConfig.getAuthenticationStrategy match {
     case auth: AbstractAuthenticationStrategy => auth.setClient(this)
@@ -97,6 +120,11 @@ abstract class AbstractHttpClient(clientConfig: ClientConfig, clientName: String
       throw new UnsupportedOperationException("only HttpAction supported, but the fact is " + requestAction.getClass)
     val action = prepareAction(requestAction.asInstanceOf[HttpAction])
     val response: CloseableHttpResponse = executeHttpAction(action)
+    Log.info("=====>response1："+response.getClass())
+    Log.info("=====>action1："+action.getClass())
+
+    Log.info("=====>response2："+response)
+    Log.info("=====>action2："+action)
     responseToResult(response, action)
   }
 
@@ -132,6 +160,10 @@ abstract class AbstractHttpClient(clientConfig: ClientConfig, clientName: String
         realURL = connectUrl(serverUrlAction.serverUrl, requestAction.getURL)
       case _ =>
         realURL = getRequestUrl(requestAction.getURL, requestAction.getRequestBody)
+    }
+    httpClient = mhttpClient
+    if(realURL.startsWith("https:")){
+        httpClient = httpClients
     }
 
     if (clientConfig.getAuthenticationStrategy != null) clientConfig.getAuthenticationStrategy.login(requestAction, realURL.replaceAll(requestAction.getURL, "")) match {
@@ -287,6 +319,7 @@ abstract class AbstractHttpClient(clientConfig: ClientConfig, clientName: String
         if (entity != null) {
           responseBody = EntityUtils.toString(entity, "UTF-8")
         }
+        Log.info("------>"+responseBody)
         httpResponseToResult(response, httpAction, responseBody)
           .getOrElse(throw new HttpMessageParseException("cannot parse message: " + responseBody))
     }
