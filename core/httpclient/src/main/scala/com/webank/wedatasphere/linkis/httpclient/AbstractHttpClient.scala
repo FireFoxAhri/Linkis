@@ -120,11 +120,7 @@ abstract class AbstractHttpClient(clientConfig: ClientConfig, clientName: String
       throw new UnsupportedOperationException("only HttpAction supported, but the fact is " + requestAction.getClass)
     val action = prepareAction(requestAction.asInstanceOf[HttpAction])
     val response: CloseableHttpResponse = executeHttpAction(action)
-    Log.info("=====>response1："+response.getClass())
-    Log.info("=====>action1："+action.getClass())
-
-    Log.info("=====>response2："+response)
-    Log.info("=====>action2："+action)
+    Log.info("=====>action2："+action.getURL)
     responseToResult(response, action)
   }
 

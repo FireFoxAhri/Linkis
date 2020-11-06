@@ -56,4 +56,9 @@ object GatewayConfiguration {
   val SSO_LOGIN_URL = CommonVars("wds.linkis.gateway.conf.sso.url", "")
 
   val LUBAN_REGISTER_URL = CommonVars("wds.linkis.gateway.conf.register.url", "")
+
+  val LUBAN_CAS_URL = CommonVars("wds.linkis.gateway.conf.cas.url", "https://www.ctyun.cn/cas/serviceValidate?service=")
+
+  val APP_ID = CommonVars("wds.linkis.gateway.conf.app.id", "")
+  val APP_SECRET = CommonVars("wds.linkis.gateway.conf.app.secret", "")
 }
