@@ -53,14 +53,15 @@ public class CtyunSSO implements SSOInterceptor {
             String userId = (String) result.get("userId");
             GatewaySSOUtils.logger().info("username:"+name);
 
-            String userName = this.registerUser(userId, name, email);
-            if(userName != null){
-                //目前是同名用户，直接用linkis的cookie，如果后续变动，再维护sso自己的cookie
-                GatewaySSOUtils.setLoginUser(gatewayContext, userName);
-            }else {
-                return null;
+            String userName;
+            try {
+                userName = this.registerUser(userId, name, email);
+            }catch (Exception e){
+                GatewaySSOUtils.logger().warn("授权异常:"+e);
+                userName = name;
             }
-
+            GatewaySSOUtils.logger().info("登陆用户:"+userName);
+            GatewaySSOUtils.setLoginUser(gatewayContext, userName);
             return userName;
         }catch (Exception e){
             GatewaySSOUtils.logger().error("Exception:"+e);
