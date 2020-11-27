@@ -61,6 +61,8 @@
             <excludes>
                 <exclude>*/**</exclude>
             </excludes>
+            <fileMode>0777</fileMode>
+            <lineEnding>unix</lineEnding>
             <outputDirectory>logs</outputDirectory>
         </fileSet>
     </fileSets>

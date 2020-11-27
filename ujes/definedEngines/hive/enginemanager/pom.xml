@@ -29,6 +29,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs-client</artifactId>
+            <version>${hadoop.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.webank.wedatasphere.linkis</groupId>
             <artifactId>linkis-ujes-enginemanager</artifactId>
             <version>${linkis.version}</version>
