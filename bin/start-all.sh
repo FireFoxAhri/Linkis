@@ -220,6 +220,9 @@ echo "Start to check all dss microservice"
 function checkServer(){
 echo "<-------------------------------->"
 echo "Begin to check $SERVER_NAME"
+
+sleep 1
+
 if test -z "$SERVER_IP"
 then
   SERVER_IP=$local_host
