@@ -93,7 +93,6 @@
                             <descriptors>
                                 <descriptor>src/main/assembly/distribution.xml</descriptor>
                             </descriptors>
-
                         </configuration>
                     </execution>
                 </executions>

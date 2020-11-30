@@ -627,3 +627,4 @@ replaceConf "wds.linkis.gateway.url" "http://$GATEWAY_INSTALL_IP:$GATEWAY_PORT" 
 isSuccess "subsitution linkis.properties of $SERVER_NAME"
 echo "<----------------$SERVER_NAME:end------------------->"
 ##Metadata Manager Server install end
+
