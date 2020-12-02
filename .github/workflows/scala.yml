@@ -17,14 +17,19 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      - name: Run tests
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Run install
         run: mvn -N install
-      - name: install
+      - name: Run package
         run: mvn clean install
       - name: Download a Build Artifact
         uses: actions/download-artifact@v2.0.6
         with:
-          # Artifact name
           name: wedatasphere-linkis-0.9.4-dist.tar.gz
-          # Destination path
           path: assembly/target
