@@ -25,6 +25,6 @@ jobs:
         uses: actions/download-artifact@v2.0.6
         with:
           # Artifact name
-          name: linkis
+          name: wedatasphere-linkis-0.9.4-dist.tar.gz
           # Destination path
-          path: assembly/target/wedatasphere-linkis-0.9.4-dist.tar.gz
+          path: assembly/target
