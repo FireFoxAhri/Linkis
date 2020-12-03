@@ -24,14 +24,11 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-      - name: Run tests
+      - name: Run install
         run: mvn -N install
-      - name: install
-        run: mvn clean install
+      - name: Run package
+        run: mvn clean install -Dmaven.test.skip=true
       - name: Download a Build Artifact
-        uses: actions/download-artifact@v2.0.6
+        uses: actions/upload-artifact@v2
         with:
-          # Artifact name
-          name: wedatasphere-linkis-0.9.4-dist.tar.gz
-          # Destination path
-          path: assembly/target
+          path: assembly/target/wedatasphere-linkis-0.9.4-dist.tar.gz
