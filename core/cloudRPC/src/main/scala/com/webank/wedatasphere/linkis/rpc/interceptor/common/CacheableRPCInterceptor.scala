@@ -42,18 +42,18 @@ class CacheableRPCInterceptor extends RPCInterceptor with Logging{
   override val order: Int = 10
 
   override def intercept(interceptorExchange: RPCInterceptorExchange, chain: RPCInterceptorChain): Any = interceptorExchange.getProtocol match {
-    case cacheable: CacheableProtocol =>
-      guavaCache.get(cacheable.toString, new Callable[Any] {
-        override def call(): Any = {
-          val returnMsg = chain.handle(interceptorExchange)
-          returnMsg match {
-            case warn: WarnException =>
-              throw warn
-            case _ =>
-              returnMsg
-          }
-        }
-      })
+//    case cacheable: CacheableProtocol =>
+//      guavaCache.get(cacheable.toString, new Callable[Any] {
+//        override def call(): Any = {
+//          val returnMsg = chain.handle(interceptorExchange)
+//          returnMsg match {
+//            case warn: WarnException =>
+//              throw warn
+//            case _ =>
+//              returnMsg
+//          }
+//        }
+//      })
     case _ => chain.handle(interceptorExchange)
   }
 }
