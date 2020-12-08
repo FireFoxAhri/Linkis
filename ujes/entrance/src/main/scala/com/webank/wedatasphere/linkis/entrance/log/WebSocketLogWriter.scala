@@ -25,5 +25,6 @@ import com.webank.wedatasphere.linkis.scheduler.queue.Job
   */
 class WebSocketLogWriter(job:Job,
                          entranceEventListenerBus: EntranceEventListenerBus[EntranceEventListener, EntranceEvent]) {
-  def write(msg: String): Unit = if(entranceEventListenerBus != null) entranceEventListenerBus.post(EntranceLogEvent(job, msg))
+  def write(msg: String): Unit = write(msg::Nil)
+  def write(msgs: Seq[String]): Unit = if(entranceEventListenerBus != null) entranceEventListenerBus.post(EntranceLogEvent(job, msgs))
 }

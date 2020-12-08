@@ -93,8 +93,8 @@ class EntranceReceiver extends Receiver with Logging {
           job.asInstanceOf[EntranceJob].setProgressInfo(progressInfo)
         }, "ResponseTaskProgress")
       }
-    case ResponseTaskLog(execId, log) =>
-      onOperate(execId, sender, entranceContext.getOrCreateLogManager().onLogUpdate(_, log), "ResponseTaskLog")
+    case ResponseTaskLog(execId, logs) =>
+      onOperate(execId, sender, entranceContext.getOrCreateLogManager().onLogUpdate(_, logs), "ResponseTaskLog")
     case ResponseTaskResultSet(execId, output, alias) =>
       onOperate(execId, sender, entranceContext.getOrCreatePersistenceManager().onResultSetCreated(_, AliasOutputExecuteResponse(alias, output)), "ResponseTaskResultSet")
     case ResponseTaskResultSize(execId, resultSize) =>

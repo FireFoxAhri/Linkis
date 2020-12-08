@@ -22,5 +22,7 @@ import com.webank.wedatasphere.linkis.scheduler.queue.Job
   * Created by enjoyyin on 2018/9/3.
   */
 trait LogListener extends SchedulerListener {
-  def onLogUpdate(job: Job, log: String): Unit
+  def onLogUpdate(job: Job, log: String): Unit = onLogUpdate(job, log::Nil)
+
+  def onLogUpdate(job: Job, logs: Seq[String]): Unit
 }

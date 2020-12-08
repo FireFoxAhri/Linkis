@@ -38,9 +38,13 @@ case class EntranceJobEvent(jobId: String) extends EntranceEvent
   * EntranceLogEvent 用在当有日志需要发送的时候，我们将这个事件进行post，eventListener会进行相应的操作。
   * 比如会通过websocket方式将日志推送到前端
   * @param job
-  * @param log
+  * @param logs
   */
-case class EntranceLogEvent(job: Job, log: String) extends EntranceEvent
+case class EntranceLogEvent(job: Job, logs: Seq[String]) extends EntranceEvent{
+  def this(job: Job, log: String){
+    this(job, log::Nil)
+  }
+}
 
 case class EntranceProgressEvent(job: Job, progress: Float, progressInfo: Array[JobProgressInfo]) extends EntranceEvent
 

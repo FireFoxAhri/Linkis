@@ -38,17 +38,21 @@ abstract class LogManager extends LogListener {
 
   def createLogWriter(job: Job): LogWriter
 
- override def onLogUpdate(job: Job, log: String): Unit = {
+ override def onLogUpdate(job: Job, logs: Seq[String]): Unit = {
    job match{
      case entranceExecutionJob:EntranceExecutionJob =>
        if (entranceExecutionJob.getLogWriter.isEmpty) entranceExecutionJob synchronized {
          if(entranceExecutionJob.getLogWriter.isEmpty) createLogWriter(entranceExecutionJob)
        }
-       entranceExecutionJob.getLogWriter.foreach(logWriter => logWriter.write(log))
-       entranceExecutionJob.getWebSocketLogWriter.foreach(writer => writer.write(log))
-       errorCodeManager.foreach(_.errorMatch(log).foreach{ case(code, errorMsg) =>
-         errorCodeListener.foreach(_.onErrorCodeCreated(job, code, errorMsg))
-       })
+       entranceExecutionJob.getLogWriter.foreach(logWriter => logs.foreach(logWriter.write))
+       entranceExecutionJob.getWebSocketLogWriter.foreach(writer => writer.write(logs))
+
+       logs.foreach(log =>
+         errorCodeManager.foreach(_.errorMatch(log).foreach{ case(code, errorMsg) =>
+           errorCodeListener.foreach(_.onErrorCodeCreated(job, code, errorMsg))
+         })
+       )
+
      case _ =>
    }
 //   if (job.isInstanceOf[EntranceExecutionJob]){

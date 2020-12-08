@@ -157,11 +157,6 @@ class EntranceWebSocketService extends ServerEventService with EntranceEventList
     //executeResponseMsg
   }
 
-  private def pushLog(log:String, job:Job):Unit = {
-    if(entranceServer.getEntranceContext.getOrCreateEventListenerBus != null)
-      entranceServer.getEntranceContext.getOrCreateEventListenerBus.post(EntranceLogEvent(job, log))
-  }
-
 
   def dealLog(event: ServerEvent, id:String):Message = {
     var retMessage:Message = null
@@ -289,102 +284,96 @@ class EntranceWebSocketService extends ServerEventService with EntranceEventList
   }
 
 
-  private def concatLog(length:Int, log:String, flag:StringBuilder, all:StringBuilder):Unit = {
-    if(length == 1){
-      flag ++= log ++= "\n"
-      all ++= log ++= "\n"
-    }else{
-      flag ++= log ++= "\n"
-      all ++= log ++= "\n"
-    }
+  private def concatLog(log:String, flag:StringBuilder, all:StringBuilder):Unit = {
+    flag ++= log ++= "\n"
+    all ++= log ++= "\n"
   }
 
   /**
     * Push the log message to the front end(将日志的消息推送给前端)
     * @param job required(需要)
-    * @param log
+    * @param logs
     */
-  def pushLogToFrontend(job: Job, log: String): Unit = {
+  def pushLogToFrontend(job: Job, logs: Seq[String]): Unit = {
     import LogReader._
-    if (StringUtils.isBlank(log)) return
-    var message:Message = null
-    val logs:Array[String] = new Array[String](4)
-    val logArr:Array[String] = log.split("\n\n").filter(StringUtils.isNotBlank)
+    if (logs.isEmpty) return
+
     val info = new StringBuilder
     val warn = new StringBuilder
     val error = new StringBuilder
     val all = new StringBuilder
-    val length = logArr.length
-    logArr.foreach(singleLog => {
-      if (StringUtils.isNotEmpty(singleLog)){
+
+
+    logs.filter(StringUtils.isNotBlank).foreach(singleLog =>
         singleLog match {
           case ERROR_HEADER1() | ERROR_HEADER2() =>
-            concatLog(length, singleLog, error, all)
-          case WARN_HEADER1() |  WARN_HEADER2() =>
-            val arr = EntranceConfiguration.LOG_WARN_EXCLUDE.getValue.split(",").map (word => word.trim)
+            concatLog(singleLog, error, all)
+          case WARN_HEADER1() | WARN_HEADER2() =>
+            val arr = EntranceConfiguration.LOG_WARN_EXCLUDE.getValue.split(",").map(word => word.trim)
             var flag = false
-            for (keyword <- arr){
+            for (keyword <- arr) {
               flag = singleLog.contains(keyword) || flag
             }
             if (!flag) {
               val message = singleLog.split("\n")(0)
-              concatLog(length, message, warn, all)
+              concatLog(message, warn, all)
             }
           case INFO_HEADER1() | INFO_HEADER2() =>
-            val hiveLogSpecial:String = EntranceConfiguration.HIVE_SPECIAL_LOG_INCLUDE.getValue
-            val sparkLogSpecial:String = EntranceConfiguration.SPARK_SPECIAL_LOG_INCLUDE.getValue
-            val hiveCreateTableLog:String = EntranceConfiguration.HIVE_CREATE_TABLE_LOG.getValue
-            if (singleLog.contains(hiveLogSpecial) && singleLog.contains(hiveCreateTableLog)){
+            val hiveLogSpecial: String = EntranceConfiguration.HIVE_SPECIAL_LOG_INCLUDE.getValue
+            val sparkLogSpecial: String = EntranceConfiguration.SPARK_SPECIAL_LOG_INCLUDE.getValue
+            val hiveCreateTableLog: String = EntranceConfiguration.HIVE_CREATE_TABLE_LOG.getValue
+            if (singleLog.contains(hiveLogSpecial) && singleLog.contains(hiveCreateTableLog)) {
               val threadName = EntranceConfiguration.HIVE_THREAD_NAME.getValue
               val printInfo = EntranceConfiguration.HIVE_PRINT_INFO_LOG.getValue
               val start = singleLog.indexOf(threadName)
               val end = singleLog.indexOf(printInfo) + printInfo.length
-              if(start > 0 && end > 0) {
+              if (start > 0 && end > 0) {
                 val realLog = singleLog.substring(0, start) + singleLog.substring(end, singleLog.length)
-                concatLog(length, realLog, info, all)
+                concatLog(realLog, info, all)
               }
             }
-            if (singleLog.contains(hiveLogSpecial) && singleLog.contains("map") && singleLog.contains("reduce")){
+            if (singleLog.contains(hiveLogSpecial) && singleLog.contains("map") && singleLog.contains("reduce")) {
               val threadName = EntranceConfiguration.HIVE_THREAD_NAME.getValue
               val stageName = EntranceConfiguration.HIVE_STAGE_NAME.getValue
               val start = singleLog.indexOf(threadName)
               val end = singleLog.indexOf(stageName)
-              if(start > 0 && end > 0) {
+              if (start > 0 && end > 0) {
                 val realLog = singleLog.substring(0, start) + singleLog.substring(end, singleLog.length)
-                concatLog(length, realLog, info, all)
+                concatLog(realLog, info, all)
               }
-            }else if (singleLog.contains(sparkLogSpecial)){
+            } else if (singleLog.contains(sparkLogSpecial)) {
               val className = EntranceConfiguration.SPARK_PROGRESS_NAME.getValue
               val endFlag = EntranceConfiguration.END_FLAG.getValue
               val start = singleLog.indexOf(className)
               val end = singleLog.indexOf(endFlag) + endFlag.length
-              if(start > 0 && end > 0) {
+              if (start > 0 && end > 0) {
                 val realLog = singleLog.substring(0, start) + singleLog.substring(end, singleLog.length)
-                concatLog(length, realLog, info, all)
+                concatLog(realLog, info, all)
               }
-            }else{
-              val arr = EntranceConfiguration.LOG_EXCLUDE.getValue.split(",").map (word => word.trim)
+            } else {
+              val arr = EntranceConfiguration.LOG_EXCLUDE.getValue.split(",").map(word => word.trim)
               var flag = false
-              for (keyword <- arr){
+              for (keyword <- arr) {
                 flag = singleLog.contains(keyword) || flag
               }
-              if (!flag) concatLog(length, singleLog, info, all)
+              if (!flag) concatLog(singleLog, info, all)
             }
           case _ =>
-            val arr = EntranceConfiguration.LOG_EXCLUDE.getValue.split(",").map (word => word.trim)
+            val arr = EntranceConfiguration.LOG_EXCLUDE.getValue.split(",").map(word => word.trim)
             var flag = false
-            for (keyword <- arr){
+            for (keyword <- arr) {
               flag = singleLog.contains(keyword) || flag
             }
-            if (!flag) concatLog(length, singleLog, info, all)
+            if (!flag) concatLog(singleLog, info, all)
         }
-      }
-    })
+    )
     val logList:util.List[String] = new util.ArrayList[String]()
     logList.add(error.toString())
     logList.add(warn.toString())
     logList.add(info.toString())
     logList.add(all.toString())
+
+    var message:Message = null
     message = Message.ok("Return log information(返回日志信息)")
     val executeApplicationName = job.asInstanceOf[EntranceJob].getTask.asInstanceOf[RequestPersistTask].getExecuteApplicationName
     val creator:String = job.asInstanceOf[EntranceJob].getTask.asInstanceOf[RequestPersistTask].getRequestApplicationName
@@ -422,7 +411,7 @@ class EntranceWebSocketService extends ServerEventService with EntranceEventList
 
   override def onEvent(event: EntranceEvent): Unit = event match {
     //Process job progress and pass information to the front end(处理Job进度，将信息传递给前端)
-    case EntranceLogEvent(job, log) => pushLogToFrontend(job, log)
+    case EntranceLogEvent(job, logs) => pushLogToFrontend(job, logs)
     case EntranceJobEvent(jobId) =>
       entranceServer.getJob(jobId).foreach { job =>
         val message = dealStatus(null, jobId)
