@@ -43,7 +43,7 @@ class JDBCEngineExecutor(outputPrintLimit: Int, properties: util.HashMap[String,
   private val LOG = LoggerFactory.getLogger(getClass)
   private val connectionManager = ConnectionManager.getInstance()
   private var statement: Statement = null
-  private var connection:Connection = null
+  private var connection: Connection = null
   private val name: String = Sender.getThisServiceInstance.getInstance
   private val persistEngine = new EntranceResultSetEngine()
   //execute line number，as alias and progress line
@@ -59,10 +59,10 @@ class JDBCEngineExecutor(outputPrintLimit: Int, properties: util.HashMap[String,
     LOG.info(s"create statement is:  $statement")
     val isResultSetAvailable = statement.execute(code)
     LOG.info(s"Is ResultSet available ? : $isResultSetAvailable")
-    if(isResultSetAvailable){
+    if (isResultSetAvailable) {
       LOG.info("ResultSet is available")
       val JDBCResultSet = statement.getResultSet
-      if(isDDLCommand(statement.getUpdateCount(),JDBCResultSet.getMetaData().getColumnCount)){
+      if (isDDLCommand(statement.getUpdateCount(), JDBCResultSet.getMetaData().getColumnCount)) {
         LOG.info(s"current result is a ResultSet Object , but there are no more results :${code} ")
         Utils.tryQuietly {
           JDBCResultSet.close()
@@ -70,7 +70,7 @@ class JDBCEngineExecutor(outputPrintLimit: Int, properties: util.HashMap[String,
           connection.close()
         }
         return SuccessExecuteResponse()
-      }else{
+      } else {
         val md = JDBCResultSet.getMetaData
         val metaArrayBuffer = new ArrayBuffer[Tuple2[String, String]]()
         for (i <- 1 to md.getColumnCount) {
@@ -80,24 +80,22 @@ class JDBCEngineExecutor(outputPrintLimit: Int, properties: util.HashMap[String,
         val metaData = new TableMetaData(columns)
         val resultSet = ResultSetFactory.getInstance.getResultSetByType(ResultSetFactory.TABLE_TYPE)
         val resultSetPath = resultSet.getResultSetPath(new FsPath(storePath), alias)
-        val resultSetWriter = ResultSetWriter.getResultSetWriter(resultSet, ENGINE_RESULT_SET_MAX_CACHE.getValue.toLong, resultSetPath)
+        val resultSetWriter = ResultSetWriter.getResultSetWriter(resultSet, ENGINE_RESULT_SET_MAX_CACHE.getValue.toLong, resultSetPath, getUser)
         resultSetWriter.addMetaData(metaData)
         var count = 0
-        Utils.tryCatch({
-          while (count < outputPrintLimit && JDBCResultSet.next()) {
-            val r: Array[Any] = columns.indices.map { i =>
-              val data = JDBCResultSet.getObject(i + 1) match {
-                case value: Any => value.toString
-                case _ => null
-              }
-              data
-            }.toArray
-            resultSetWriter.addRecord(new TableRecord(r))
-            count += 1
-          }
-        }) {
-          case e: Exception => return ErrorExecuteResponse("query jdbc failed", e)
+
+        while (count < outputPrintLimit && JDBCResultSet.next()) {
+          val r: Array[Any] = columns.indices.map { i =>
+            val data = JDBCResultSet.getObject(i + 1) match {
+              case value: Any => value.toString
+              case _ => null
+            }
+            data
+          }.toArray
+          resultSetWriter.addRecord(new TableRecord(r))
+          count += 1
         }
+
         val output = if (resultSetWriter != null) resultSetWriter.toString else null
         Utils.tryQuietly {
           JDBCResultSet.close()
@@ -107,9 +105,9 @@ class JDBCEngineExecutor(outputPrintLimit: Int, properties: util.HashMap[String,
         LOG.info("sql execute completed")
         AliasOutputExecuteResponse(alias, output)
       }
-    }else{
+    } else {
       LOG.info(s"only return affect rows : ${statement.getUpdateCount}")
-      Utils.tryQuietly{
+      Utils.tryQuietly {
         statement.close()
         connection.close()
       }
@@ -121,9 +119,9 @@ class JDBCEngineExecutor(outputPrintLimit: Int, properties: util.HashMap[String,
   override protected def callExecute(request: RequestTask): EngineExecuteAsynReturn = null
 
   override def progress(): Float = {
-    if (totalCodeLineNumber != 0){
-      return (codeLine/totalCodeLineNumber.asInstanceOf[Float])
-    }else{
+    if (totalCodeLineNumber != 0) {
+      return (codeLine / totalCodeLineNumber.asInstanceOf[Float])
+    } else {
       return 0.0f
     }
   }
@@ -159,12 +157,13 @@ class JDBCEngineExecutor(outputPrintLimit: Int, properties: util.HashMap[String,
   }
 
   protected def isDDLCommand(updatedCount: Int, columnCount: Int): Boolean = {
-    if (updatedCount<0 && columnCount<=0){
+    if (updatedCount < 0 && columnCount <= 0) {
       return true
-    }else{
+    } else {
       return false
     }
   }
+
   override def execute(executeRequest: ExecuteRequest): ExecuteResponse = {
     if (StringUtils.isEmpty(executeRequest.code)) {
       return IncompleteExecuteResponse("execute codes can not be empty)")
@@ -196,22 +195,22 @@ class JDBCEngineExecutor(outputPrintLimit: Int, properties: util.HashMap[String,
           codeLine = codeLine + 1
         } catch {
           case e: Exception =>
-            totalCodeLineNumber=0
+            totalCodeLineNumber = 0
             LOG.error("JDBC exception", e)
             return ErrorExecuteResponse("JDBC exception", e)
           case t: Throwable =>
-            totalCodeLineNumber=0
+            totalCodeLineNumber = 0
             logger.error("JDBC query failed", t)
             return ErrorExecuteResponse("JDBC query failed", t)
-        }finally {
-          Utils.tryQuietly{
+        } finally {
+          Utils.tryQuietly {
             statement.close()
             connection.close()
           }
         }
       }
     }
-    totalCodeLineNumber=0
+    totalCodeLineNumber = 0
     SuccessExecuteResponse()
   }
 }
