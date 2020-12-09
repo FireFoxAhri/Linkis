@@ -21,6 +21,10 @@
 info="We will start all linkis applications, it will take some time, please wait"
 echo ${info}
 
+if [ $USER = "root" ]; then
+  echo "Use root to deploy the service is not recommended and it may cause issues"
+fi
+
 #Actively load user env
 source /etc/profile
 source ~/.bash_profile

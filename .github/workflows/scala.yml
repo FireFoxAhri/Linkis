@@ -39,4 +39,5 @@ jobs:
       - name: Download a Build Artifact
         uses: actions/upload-artifact@v2
         with:
+          name: wedatasphere-linkis-0.9.4-dist.tar.gz
           path: assembly/target/wedatasphere-linkis-0.9.4-dist.tar.gz
