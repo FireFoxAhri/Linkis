@@ -29,7 +29,7 @@
 
 
     <!--<properties>-->
-        <!--<hive.version>1.2.1</hive.version>-->
+    <!--<hive.version>1.2.1</hive.version>-->
     <!--</properties>-->
     <dependencies>
         <dependency>
@@ -49,7 +49,6 @@
             <version>${linkis.version}</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>org.apache.hive</groupId>
             <artifactId>hive-common</artifactId>
@@ -90,6 +89,10 @@
             <artifactId>hive-exec</artifactId>
             <version>${hive.version}</version>
             <exclusions>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-yarn-registry</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>org.apache.hive</groupId>
                     <artifactId>hive-ant</artifactId>
@@ -357,7 +360,6 @@
             </plugin>
         </plugins>
     </build>
-
 
 
 </project>

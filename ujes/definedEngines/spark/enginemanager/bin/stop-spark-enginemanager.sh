@@ -1,8 +1,8 @@
 #!/bin/bash
 
-cd `dirname $0`
+cd $(dirname $0)
 cd ..
-HOME=`pwd`
+HOME=$(pwd)
 
 export SERVER_PID=$HOME/bin/linkis.pid
 
@@ -18,8 +18,8 @@ function wait_for_server_to_die() {
   forceKill=1
 
   while [[ $currentTime -lt $timeoutTime ]]; do
-    $(kill ${pid} > /dev/null 2> /dev/null)
-    if kill -0 ${pid} > /dev/null 2>&1; then
+    $(kill ${pid} >/dev/null 2>/dev/null)
+    if kill -0 ${pid} >/dev/null 2>&1; then
       sleep 3
     else
       forceKill=0
@@ -29,19 +29,26 @@ function wait_for_server_to_die() {
   done
 
   if [[ forceKill -ne 0 ]]; then
-    $(kill -9 ${pid} > /dev/null 2> /dev/null)
+    $(kill -9 ${pid} >/dev/null 2>/dev/null)
   fi
 }
 
 if [[ ! -f "${SERVER_PID}" ]]; then
-    echo "server $SERVER_NAME is not running"
+  echo "server $SERVER_NAME is not running"
 else
-    pid=$(cat ${SERVER_PID})
-    if [[ -z "${pid}" ]]; then
-      echo "server $SERVER_NAME is not running"
+  pid=$(cat ${SERVER_PID})
+  if [[ -z "${pid}" ]]; then
+    echo "server $SERVER_NAME is not running"
+  else
+    user=$(ps -p ${pid} -o user=)
+    if [[ -z "${user}" ]]; then
+      echo "pid file exist but cannot find the process."
+    elif [ $user != $USER ]; then
+      echo "server is not running by user [${USER}], cannot stop it. Please use user [${user}] to do this."
     else
       wait_for_server_to_die $pid 40
       $(rm -f ${SERVER_PID})
       echo "server $SERVER_NAME is stopped."
     fi
+  fi
 fi

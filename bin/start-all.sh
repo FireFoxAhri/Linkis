@@ -21,6 +21,10 @@
 info="We will start all linkis applications, it will take some time, please wait"
 echo ${info}
 
+if [ $USER = "root" ]; then
+  echo "Use root to deploy the service is not recommended and it may cause issues"
+fi
+
 #Actively load user env
 source /etc/profile
 source ~/.bash_profile
@@ -220,6 +224,9 @@ echo "Start to check all dss microservice"
 function checkServer(){
 echo "<-------------------------------->"
 echo "Begin to check $SERVER_NAME"
+
+sleep 1
+
 if test -z "$SERVER_IP"
 then
   SERVER_IP=$local_host
