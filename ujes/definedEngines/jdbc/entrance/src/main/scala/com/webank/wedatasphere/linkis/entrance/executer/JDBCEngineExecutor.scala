@@ -98,6 +98,7 @@ class JDBCEngineExecutor(outputPrintLimit: Int, properties: util.HashMap[String,
 
         val output = if (resultSetWriter != null) resultSetWriter.toString else null
         Utils.tryQuietly {
+          resultSetWriter.close()
           JDBCResultSet.close()
           statement.close()
           connection.close()

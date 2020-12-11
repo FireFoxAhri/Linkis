@@ -451,6 +451,10 @@ public class FsRestfulApi {
             message.data("type", fileSource.getParams().get("type"));
             message.data("totalLine", Integer.valueOf(fileSource.getParams().get("totalLine")));
             return Message.messageToResponse(message.data("page", page).data("totalPage", 0));
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOGGER.error("error", e);
+            return Message.messageToResponse(Message.error("获取结果失败！"));
         } finally {
             IOUtils.closeQuietly(fileSource);
         }
