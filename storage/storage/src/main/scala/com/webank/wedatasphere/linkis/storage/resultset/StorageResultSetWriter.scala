@@ -67,7 +67,7 @@ class StorageResultSetWriter[K <: MetaData, V <: Record](resultSet: ResultSet[K,
     writeLine(resultSet.getResultSetHeader)
   }
 
-  def createNewFile: Unit = {
+  def createNewFileIfNeeded: Unit = {
     if(storePath != null && outputStream == null){
        fs = FSFactory.getFsByProxyUser(storePath,proxyUser)
       fs.init(null)
@@ -78,22 +78,18 @@ class StorageResultSetWriter[K <: MetaData, V <: Record](resultSet: ResultSet[K,
   }
 
   def writeLine(bytes: Array[Byte]): Unit = {
+    buffer.appendAll(bytes)
+
     if(buffer.length  > maxCacheSize) {
-      if(outputStream == null) {
-        createNewFile
-      }
       flush()
-      outputStream.write(bytes)
-    } else {
-      buffer.appendAll(bytes)
     }
   }
   override def toString: String = {
    if(outputStream == null){
-     if(isEmpty) return ""
+      if(isEmpty) return ""
       new String(buffer.toArray,Dolphin.CHAR_SET)
     } else {
-     storePath.getSchemaPath
+      storePath.getSchemaPath
     }
   }
 
@@ -142,7 +138,7 @@ class StorageResultSetWriter[K <: MetaData, V <: Record](resultSet: ResultSet[K,
   }
 
   override def flush(): Unit = {
-    createNewFile
+    createNewFileIfNeeded
     if(outputStream != null) {
       if(buffer.nonEmpty) {
         outputStream.write(buffer.toArray)
