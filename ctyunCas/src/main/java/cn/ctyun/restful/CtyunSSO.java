@@ -77,7 +77,7 @@ public class CtyunSSO implements SSOInterceptor {
     @Override
     public String redirectTo(URI requestUrl) {
         GatewaySSOUtils.logger().info("redirectTo:"+requestUrl);
-        return "http://www.ctyun.cn/cas/login?service=" + GatewayConfiguration.SSO_LOGIN_URL().getValue();
+        return "https://www.ctyun.cn/login?service=" + GatewayConfiguration.SSO_LOGIN_URL().getValue();
     }
 
     private String registerUser(String userId, String name, String email) throws IOException {
