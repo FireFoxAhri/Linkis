@@ -31,19 +31,15 @@
     <!--<version>${bdp.ide.version}</version>-->
     <!--<name>linkis-Spark-Engine</name>-->
     <properties>
-        <spark.version>2.4.3</spark.version>
+        <spark.version>2.4.7</spark.version>
     </properties>
 
-
     <dependencies>
-
         <dependency>
             <groupId>com.webank.wedatasphere.linkis</groupId>
             <artifactId>linkis-ujes-engine</artifactId>
             <version>${linkis.version}</version>
         </dependency>
-
-
 
         <dependency>
             <groupId>com.webank.wedatasphere.linkis</groupId>
@@ -75,6 +71,13 @@
             <artifactId>linkis-bml-hook</artifactId>
             <version>${linkis.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_${scala.binary.version}</artifactId>
