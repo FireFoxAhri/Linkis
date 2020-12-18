@@ -32,6 +32,7 @@ import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.collection.JavaConverters;
 
 import java.io.Serializable;
 import java.util.List;
@@ -72,11 +73,7 @@ public class SendAppender extends AbstractAppender {
                 }
                 List<String> logs = logCache.getRemain();
                 if (logs.size() > 0){
-                    StringBuilder sb = new StringBuilder();
-                    for(String log : logs){
-                        sb.append(log).append("\n");
-                    }
-                    logListener.onLogUpdate(null, sb.toString());
+                    logListener.onLogUpdate(null, JavaConverters.asScalaIteratorConverter(logs.iterator()).asScala().toSeq());
                 }
             }
         }

@@ -130,7 +130,7 @@ abstract class EntranceJob extends LockJob {
 
   override def onFailure(errorMsg: String, t: Throwable): Unit = {
     this.entranceListenerBus.foreach(_.post(
-      EntranceLogEvent(this, LogUtils.generateERROR(s"Sorry, your job executed failed with reason: $errorMsg"))))
+      new EntranceLogEvent(this, LogUtils.generateERROR(s"Sorry, your job executed failed with reason: $errorMsg"))))
     super.onFailure(errorMsg, t)
   }
 

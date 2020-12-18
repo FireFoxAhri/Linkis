@@ -36,7 +36,7 @@ case class ResponseEngineStatusChanged(instance: String, fromState: Int, toState
 case class ResponseEngineInfo(createEntranceInstance: String, creator: String, user: String, properties: util.Map[String, String])
 case class ResponseEngineStatus(instance: String, state: Int, overload: EngineOverloadInfo, concurrent: EngineConcurrentInfo,
                                 engineInfo: ResponseEngineInfo)
-case class ResponseTaskLog(execId: String, log: String)(
+case class ResponseTaskLog(execId: String, log: Seq[String])(
   implicit override val userWithCreator: UserWithCreator) extends RetryableProtocol with IRServiceGroupProtocol
 
 case class ResponseTaskError(execId: String, errorMsg: String)(

@@ -297,13 +297,13 @@ class EngineReceiver extends Receiver with JobListener with ProgressListener wit
   override def onProgressUpdate(job: Job, progress: Float, progressInfo: Array[JobProgressInfo]): Unit =
     if(ENGINE_PUSH_PROGRESS_TO_ENTRANCE.getValue) send(job, ResponseTaskProgress(job.getId, progress, progressInfo))
 
-  override def onLogUpdate(job: Job, log: String): Unit = if(ENGINE_PUSH_LOG_TO_ENTRANCE.getValue) {
-    if(job != null) send(job, ResponseTaskLog(job.getId, log))
+  override def onLogUpdate(job: Job, logs: Seq[String]): Unit = if(ENGINE_PUSH_LOG_TO_ENTRANCE.getValue){
+    if(job != null) send(job, ResponseTaskLog(job.getId, logs))
     else {
       val consumers = engineServer.getEngineContext.getOrCreateScheduler.getSchedulerContext
         .getOrCreateConsumerManager.listConsumers()
       consumers.foreach(_.getRunningEvents.foreach{
-        case job: Job => Utils.tryAndWarn(send(job, ResponseTaskLog(job.getId, log)))
+        case job: Job => Utils.tryAndWarn(send(job, ResponseTaskLog(job.getId, logs)))
       })
     }
   }
