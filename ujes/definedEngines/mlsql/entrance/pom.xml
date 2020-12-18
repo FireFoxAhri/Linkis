@@ -49,7 +49,7 @@
             <artifactId>common-utils_${scala.binary.version}</artifactId>
             <!--compile scala2.12-->
             <!--<version>0.2.5</version>-->
-            <version>0.2.0</version>
+            <version>0.2.9</version>
         </dependency>
 
         <dependency>

@@ -351,6 +351,7 @@ executeCMD $SERVER_IP   "sed -i ${txt}  \"s#wds.linkis.enginemanager.sudo.script
 SERVER_ENGINE_CONF_PATH=$SERVER_HOME/$SERVER_NAME/conf/linkis-engine.properties
 executeCMD $SERVER_IP   "sed -i ${txt}  \"s#\#hadoop.config.dir.*#hadoop.config.dir=$HADOOP_CONF_DIR#g\" $SERVER_ENGINE_CONF_PATH"
 replaceConf "wds.linkis.gateway.url" "http://$GATEWAY_INSTALL_IP:$GATEWAY_PORT" "$SERVER_ENGINE_CONF_PATH"
+executeCMD $SERVER_IP   "chmod 777 $SERVER_HOME/$SERVER_NAME/logs"
 isSuccess "subsitution linkis.properties of $SERVER_NAME"
 echo "<----------------$SERVER_NAME:end------------------->"
 
@@ -467,6 +468,7 @@ executeCMD $SERVER_IP   "sed -i ${txt}  \"s#\#hadoop.config.dir.*#hadoop.config.
 executeCMD $SERVER_IP   "sed -i ${txt}  \"s#\#hive.config.dir.*#hive.config.dir=$HIVE_CONF_DIR#g\" $SERVER_ENGINE_CONF_PATH"
 replaceConf "wds.linkis.gateway.url" "http://$GATEWAY_INSTALL_IP:$GATEWAY_PORT" "$SERVER_ENGINE_CONF_PATH"
 isSuccess "subsitution linkis.properties of $SERVER_NAME"
+executeCMD $SERVER_IP   "chmod 777 $SERVER_HOME/$SERVER_NAME/logs"
 executeCMD $SERVER_IP   "rm $SERVER_HOME/$SERVER_NAME/lib/guava-25.1-jre.jar"
 executeCMD $SERVER_IP   "rm $SERVER_HOME/$SERVER_NAME/lib/servlet-api-2.5.jar"
 echo "<----------------$SERVER_NAME:end------------------->"
@@ -519,6 +521,7 @@ SERVER_ENGINE_CONF_PATH=$SERVER_HOME/$SERVER_NAME/conf/linkis-engine.properties
 executeCMD $SERVER_IP   "sed -i ${txt}  \"s#\#hadoop.config.dir.*#hadoop.config.dir=$HADOOP_CONF_DIR#g\" $SERVER_ENGINE_CONF_PATH"
 executeCMD $SERVER_IP   "sed -i ${txt}  \"s#\#spark.config.dir.*#spark.config.dir=$SPARK_CONF_DIR#g\" $SERVER_ENGINE_CONF_PATH"
 replaceConf "wds.linkis.gateway.url" "http://$GATEWAY_INSTALL_IP:$GATEWAY_PORT" "$SERVER_ENGINE_CONF_PATH"
+executeCMD $SERVER_IP   "chmod 777 $SERVER_HOME/$SERVER_NAME/logs"
 isSuccess "subsitution linkis.properties of $SERVER_NAME"
 echo "<----------------$SERVER_NAME:end------------------->"
 ##SparkEM install end
@@ -576,6 +579,7 @@ executeCMD $SERVER_IP   "sed -i ${txt}  \"s#wds.linkis.enginemanager.sudo.script
 SERVER_ENGINE_CONF_PATH=$SERVER_HOME/$SERVER_NAME/conf/linkis-engine.properties
 executeCMD $SERVER_IP   "sed -i ${txt}  \"s#\#hadoop.config.dir.*#hadoop.config.dir=$HADOOP_CONF_DIR#g\" $SERVER_ENGINE_CONF_PATH"
 replaceConf "wds.linkis.gateway.url" "http://$GATEWAY_INSTALL_IP:$GATEWAY_PORT" "$SERVER_ENGINE_CONF_PATH"
+executeCMD $SERVER_IP   "chmod 777 $SERVER_HOME/$SERVER_NAME/logs"
 isSuccess "subsitution linkis.properties of $SERVER_NAME"
 echo "<----------------$SERVER_NAME:end------------------->"
 
@@ -589,6 +593,8 @@ installPackage
 echo "$SERVER_NAME-step4:update linkis conf"
 SERVER_CONF_PATH=$SERVER_HOME/$SERVER_NAME/conf/linkis.properties
 executeCMD $SERVER_IP   "sed -i ${txt}  \"s#\#hadoop.config.dir.*#hadoop.config.dir=$HADOOP_CONF_DIR#g\" $SERVER_CONF_PATH"
+executeCMD $SERVER_IP   "sed -i ${txt}  \"s#wds.linkis.entrance.config.logPath.*#wds.linkis.entrance.config.logPath=$WORKSPACE_USER_ROOT_PATH#g\" $SERVER_CONF_PATH"
+executeCMD $SERVER_IP   "sed -i ${txt}  \"s#wds.linkis.resultSet.store.path.*#wds.linkis.resultSet.store.path=$RESULT_SET_ROOT_PATH#g\" $SERVER_CONF_PATH"
 replaceConf "wds.linkis.gateway.url" "http://$GATEWAY_INSTALL_IP:$GATEWAY_PORT" "$SERVER_CONF_PATH"
 isSuccess "subsitution linkis.properties of $SERVER_NAME"
 echo "<----------------$SERVER_NAME:end------------------->"
