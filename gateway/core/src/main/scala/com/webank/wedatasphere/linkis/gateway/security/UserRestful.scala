@@ -16,7 +16,9 @@
 
 package com.webank.wedatasphere.linkis.gateway.security
 
-import com.google.gson.Gson
+import java.awt.Font
+import java.util
+import com.google.gson.{Gson, JsonObject}
 import com.webank.wedatasphere.linkis.common.utils.{Logging, RSAUtils, Utils}
 import com.webank.wedatasphere.linkis.gateway.config.GatewayConfiguration
 import com.webank.wedatasphere.linkis.gateway.http.GatewayContext
@@ -26,6 +28,8 @@ import com.webank.wedatasphere.linkis.rpc.Sender
 import com.webank.wedatasphere.linkis.server.conf.ServerConfiguration
 import com.webank.wedatasphere.linkis.server.security.SSOUtils
 import com.webank.wedatasphere.linkis.server.{Message, _}
+import com.wf.captcha.SpecCaptcha
+import com.wf.captcha.base.Captcha
 import org.apache.commons.lang.StringUtils
 
 /**
@@ -61,6 +65,7 @@ abstract class AbstractUserRestful extends UserRestful with Logging {
       case "userInfo" => userInfo(gatewayContext)
       case "publicKey" => publicKey(gatewayContext)
       case "heartbeat" => heartbeat(gatewayContext)
+      case "captcha" => captcha(gatewayContext)
       case _ =>
         warn(s"Unknown request URI" + path)
         Message.error("unknown request URI " + path)
@@ -74,6 +79,24 @@ abstract class AbstractUserRestful extends UserRestful with Logging {
     val message = tryLogin(gatewayContext)
     if(securityHooks != null) securityHooks.foreach(_.postLogin(gatewayContext))
     message
+  }
+
+  @throws[Exception]
+  def captcha(gatewayContext: GatewayContext): Message = {
+    if(GatewayConfiguration.ENABLE_LOGIN_CAPTCHA.getValue){
+      val response = gatewayContext.getResponse
+      val specCaptcha = new SpecCaptcha(130, 48, 5)
+      specCaptcha.setFont(new Font("Verdana", Font.PLAIN, 32))
+      specCaptcha.setCharType(Captcha.TYPE_DEFAULT)
+      GatewaySSOUtils.setCaptcha(response, specCaptcha.text().toLowerCase())
+
+      val message = Message.ok();
+      val hashMap = new util.HashMap[String, Object]
+      hashMap.put("image", specCaptcha.toBase64())
+      message.setData(hashMap)
+      return message
+    }
+    Message.error("Function not enabled ")
   }
 
   def register(gatewayContext: GatewayContext): Message = {
@@ -115,6 +138,7 @@ abstract class UserPwdAbstractUserRestful extends AbstractUserRestful with Loggi
   override protected def tryLogin(gatewayContext: GatewayContext): Message = {
     val userNameArray = gatewayContext.getRequest.getQueryParams.get("userName")
     val passwordArray = gatewayContext.getRequest.getQueryParams.get("password")
+
     val (userName, password) = if(userNameArray != null && userNameArray.nonEmpty &&
       passwordArray != null && passwordArray.nonEmpty)
       (userNameArray.head, passwordArray.head)
@@ -122,6 +146,27 @@ abstract class UserPwdAbstractUserRestful extends AbstractUserRestful with Loggi
       val json = BDPJettyServerHelper.gson.fromJson(gatewayContext.getRequest.getRequestBody, classOf[java.util.Map[String, Object]])
       (json.get("userName"), json.get("password"))
     } else (null, null)
+
+    if(GatewayConfiguration.ENABLE_LOGIN_CAPTCHA.getValue){
+      val captchaArray = gatewayContext.getRequest.getQueryParams.get("captcha")
+      val captcha = if(userNameArray != null && userNameArray.nonEmpty){
+        captchaArray.head
+      }else {
+        if(StringUtils.isNotBlank(gatewayContext.getRequest.getRequestBody)){
+          val json = BDPJettyServerHelper.gson.fromJson(gatewayContext.getRequest.getRequestBody, classOf[java.util.Map[String, Object]])
+          json.get("captcha")
+        }
+      }
+      if(captcha == null || StringUtils.isBlank(captcha.toString)){
+        return Message.error("Verification code can not be empty(验证码不能为空)！")
+      }else{
+        val code = GatewaySSOUtils.getCaptcha(gatewayContext)
+        if(code != captcha) {
+          GatewaySSOUtils.setCaptcha(gatewayContext.getResponse, "")  //清空
+          return Message.error("Verification code error(验证码错误)！")
+        }
+      }
+    }
     if(userName == null || StringUtils.isBlank(userName.toString)) {
       Message.error("Username can not be empty(用户名不能为空)！")
     } else if(password == null || StringUtils.isBlank(password.toString)) {

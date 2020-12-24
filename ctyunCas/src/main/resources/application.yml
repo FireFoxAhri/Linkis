@@ -1,0 +1,21 @@
+server:
+  port: 9010
+spring:
+  application:
+    name: ctyun-cas
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://192.168.9.180:20303/eureka/
+    registry-fetch-interval-seconds: 5
+  instance:
+    metadata-map:
+      test: wedatasphere
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh,info
+

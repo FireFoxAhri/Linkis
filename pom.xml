@@ -133,6 +133,7 @@
         <module>datasource/datasourcemanager/server</module>
         <module>assembly/public-module</module>
         <module>assembly</module>
+        <module>ctyunCas</module>
 
     </modules>
 
@@ -157,6 +158,7 @@
         <maven.version>3.3.3</maven.version>
         <xstream.core.version>1.4.11.1</xstream.core.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <captcha.version>1.6.2</captcha.version>
     </properties>
 
     <dependencyManagement>

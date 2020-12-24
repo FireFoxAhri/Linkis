@@ -1,6 +1,7 @@
 *.iml
 .idea
 .DS_Store
+logs/
 
 assembly/target
 
@@ -78,6 +79,8 @@ bml/bmlserver/target/
 core/hadoop-common/target/
 publicService/workspace/client/workspace-httpclient/target/
 userControl/target/
+
+ctyunCas/target/
 
 ujes/definedEngines/shell/engine/target/
 ujes/definedEngines/shell/enginemanager/target/
