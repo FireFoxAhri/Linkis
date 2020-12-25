@@ -2,6 +2,7 @@ package cn.ctyun.utils;
 
 import com.webank.wedatasphere.linkis.gateway.config.GatewayConfiguration;
 import com.webank.wedatasphere.linkis.gateway.security.GatewaySSOUtils;
+import com.webank.wedatasphere.linkis.gateway.security.GatewaySSOUtils$;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -21,22 +22,22 @@ public class CasValidate {
 
     public static JSONObject validate(String ticket) throws IOException {
         HmacSHA256 coder = new HmacSHA256();
-        String now = new Date().getTime()+"";
+        String now = new Date().getTime() + "";
         StringBuffer toSign = new StringBuffer();
         toSign.append(appId).append("@");
         toSign.append(service).append("@");
         toSign.append(ticket).append("@");
         toSign.append(now);
-        String signed = coder.encode(toSign.toString(),appSecret);
-        GatewaySSOUtils.logger().info("签名文本:"+toSign+"<--->生成的签名是:" + signed);
+        String signed = coder.encode(toSign.toString(), appSecret);
+        GatewaySSOUtils$.MODULE$.logger().info("签名文本:" + toSign + "<--->生成的签名是:" + signed);
 
         StringBuffer url = new StringBuffer();
-        url.append(GatewayConfiguration.LUBAN_CAS_URL().getValue()+service+"&ticket="+ticket).append("&")
+        url.append(GatewayConfiguration.LUBAN_CAS_URL().getValue() + service + "&ticket=" + ticket).append("&")
                 .append("appId=").append(appId).append("&")
                 .append("timestamp=").append(now).append("&")
                 .append("signature=").append(signed);
 
-        GatewaySSOUtils.logger().info("url:"+url);
+        GatewaySSOUtils$.MODULE$.logger().info("url:" + url);
         CloseableHttpClient httpclient = HttpClients.createDefault();
         HttpGet httpget = new HttpGet(url.toString());
         CloseableHttpResponse response = null;
@@ -46,18 +47,17 @@ public class CasValidate {
             if (response.getStatusLine().getStatusCode() == 200) {
                 String content = EntityUtils.toString(response.getEntity(), "UTF-8");
                 jsonObj = XML.toJSONObject(content);
-                if(jsonObj.getJSONObject("cas:serviceResponse").has("cas:authenticationSuccess")){
-                  JSONObject userInfo = jsonObj.getJSONObject("cas:serviceResponse").getJSONObject("cas:authenticationSuccess").getJSONObject("cas:attributes");
-                    GatewaySSOUtils.logger().info("验证成功：userInfo:"+userInfo);
-                  if(userInfo != null){
-                      return userInfo;
-                  }
-                }else {
-                    GatewaySSOUtils.logger().error("验证失败："+ jsonObj.getJSONObject("cas:serviceResponse"));
+                if (jsonObj.getJSONObject("cas:serviceResponse").has("cas:authenticationSuccess")) {
+                    JSONObject userInfo = jsonObj.getJSONObject("cas:serviceResponse").getJSONObject("cas:authenticationSuccess").getJSONObject("cas:attributes");
+                    GatewaySSOUtils$.MODULE$.logger().info("验证成功：userInfo:" + userInfo);
+                    if (userInfo != null) {
+                        return userInfo;
+                    }
+                } else {
+                    GatewaySSOUtils$.MODULE$.logger().error("验证失败：" + jsonObj.getJSONObject("cas:serviceResponse"));
                 }
             }
-        }
-        finally {
+        } finally {
             if (response != null) {
                 response.close();
             }
