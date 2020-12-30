@@ -36,6 +36,11 @@
         <dwc.python.version>0.9.4</dwc.python.version>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs-client</artifactId>
+            <version>${hadoop.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>

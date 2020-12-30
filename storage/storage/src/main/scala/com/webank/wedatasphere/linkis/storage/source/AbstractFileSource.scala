@@ -28,8 +28,8 @@ import org.apache.commons.math3.util.Pair
 import scala.collection.JavaConversions._
 
 /**
-  * Created by johnnwang on 2020/1/15.
-  */
+ * Created by johnnwang on 2020/1/15.
+ */
 abstract class AbstractFileSource extends FileSource {
 
   protected var start: Int = 0
@@ -106,9 +106,14 @@ abstract class AbstractFileSource extends FileSource {
   override def close(): Unit = IOUtils.closeQuietly(this.fsReader)
 
   def collectRecord(record: Record): Array[String] = {
+    println("collect")
     record match {
-      case t: TableRecord => t.row.map(_.toString)
-      case l: LineRecord => Array(l.getLine)
+      case t: TableRecord =>
+        println("collect1", t == null, t.row == null, t.row.map(_ == null).mkString("Array(", ", ", ")"))
+        t.row.map(_.toString)
+      case l: LineRecord =>
+        println("collect2", l == null, l.getLine == null)
+        Array(l.getLine)
     }
   }
 

@@ -29,9 +29,35 @@
 
     <artifactId>linkis-metadata</artifactId>
     <!--<properties>-->
-        <!--<hive.version>1.2.1</hive.version>-->
+    <!--<hive.version>1.2.1</hive.version>-->
     <!--</properties>-->
     <dependencies>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>${hadoop.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+            <version>${hadoop.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-auth</artifactId>
+            <version>${hadoop.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-annotations</artifactId>
+            <version>${hadoop.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs-client</artifactId>
+            <version>${hadoop.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.webank.wedatasphere.linkis</groupId>
             <artifactId>linkis-hadoop-common</artifactId>
@@ -52,10 +78,10 @@
             </exclusions>
             <scope>provided</scope>
         </dependency>
-       <!-- <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-        </dependency>-->
+        <!-- <dependency>
+             <groupId>commons-collections</groupId>
+             <artifactId>commons-collections</artifactId>
+         </dependency>-->
         <dependency>
             <groupId>com.webank.wedatasphere.linkis</groupId>
             <artifactId>linkis-cloudRPC</artifactId>
@@ -94,16 +120,16 @@
             </exclusions>
 
         </dependency>
-       <!-- <dependency>
-            <groupId>com.github.pagehelper</groupId>
-            <artifactId>pagehelper</artifactId>
-            <version>5.1.4</version>
-        </dependency>
-        <dependency>
-            <groupId>com.diffplug.durian</groupId>
-            <artifactId>durian</artifactId>
-            <version>3.3.0</version>
-        </dependency>-->
+        <!-- <dependency>
+             <groupId>com.github.pagehelper</groupId>
+             <artifactId>pagehelper</artifactId>
+             <version>5.1.4</version>
+         </dependency>
+         <dependency>
+             <groupId>com.diffplug.durian</groupId>
+             <artifactId>durian</artifactId>
+             <version>3.3.0</version>
+         </dependency>-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>

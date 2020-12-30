@@ -26,7 +26,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <mysql.version>5.1.34</mysql.version>
     </properties>
 
     <dependencies>
