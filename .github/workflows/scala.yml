@@ -32,7 +32,7 @@ jobs:
       - name: Run install
         run: mvn -N install
       - name: Run package
-        run: mvn -T 1C clean install -Dmaven.test.skip=true
+        run: mvn -T 1C -e -pl '!assembly/public-module, !assembly' clean install -Dmaven.test.skip=true && mvn -pl assembly/public-module,assembly clean install -Dmaven.test.skip=true
       - name: Download a Build Artifact
         uses: actions/upload-artifact@v2
         with:
